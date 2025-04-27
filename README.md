@@ -21,3 +21,6 @@ Numpy, Scipy, Sympy, Pandas, PyTorch, Taichi, tqdm, Matplotlib (these also conta
 
 ## Contents
 Although the code is not well documented, each main file contains a small description in the beginning for better orientation.
+
+## Assumptions
+The data analysing scripts expect the access to the folder ..\clean_data. This data is archived at Zenodo, the public DOI can be found in the thesis itself.
