@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Apr  5 18:55:57 2025
-
-@author: balazs
+This is intended for plotting the results of the simulation from wave_eq_1d.py.
 """
 
 import numpy as np
