@@ -30,6 +30,8 @@ from helium_old.helium_old import SVP_to_T, torr, second_sound_velocity
 
 from multiprocessing import shared_memory
 
+from tqdm import tqdm
+
 def load_data(data_folder):
     try:
         all_data = np.load(os.path.join(data_folder, 'SS_test_one_file.npy'))
@@ -62,17 +64,21 @@ from speed_of_sound import c_peaks, default_plot
 
 
 def func(args):
-    spec, L, L_s, ind, n, index = args
-    shm = shared_memory.SharedMemory(name = f'state_indicator{index}')
-    shared_array = np.ndarray((n, ), dtype = np.uint8, buffer = shm.buf)
+    try:
+        spec, L, L_s, ind, n, index = args
+        shm = shared_memory.SharedMemory(name = f'state_indicator{index}')
+        shared_array = np.ndarray((n, ), dtype = np.uint8, buffer = shm.buf)
+        
+        shared_array[ind] = 1
+    except:
+        pass
     
     c0 = c_peaks(spec, L, L_s, filt=(50, 4), mc=True, f_range=[25, 400], harm = 1)
-    shared_array[ind] = 1
+    
     return c0
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    from tqdm import tqdm
     all_data = load_data(data_folder)
     
     p_avgs = np.mean(all_data[:, 3, :], axis = 1)
@@ -92,7 +98,18 @@ if __name__ == '__main__':
 
     for i in tqdm(range(b_num)):
         bins[i, :, :] = np.sum(use_data[mask == i, :, :], axis = 0)/hist[i]
-
+    
+    f = bins[0, 0, :]
+    xs, ys = bins[:, 1, :], bins[:, 2, :]
+    
+    fig, ax = plt.subplots()
+    im = ax.imshow(abs(xs+1j*ys), aspect = 'auto', extent = [f[0]/1000, f[-1]/1000, min(T_avgs), max(T_avgs)], origin = 'lower')
+    ax.set_xlabel('f (kHz)')
+    ax.set_ylabel('T (K)')
+    cbar = fig.colorbar(im, ax = ax, pad=0.02)
+    cbar.set_label("r (a. u.)")
+    
+    
     del use_reord
     del mask
     
@@ -127,13 +144,17 @@ if __name__ == '__main__':
     shared_array = np.ndarray((n, ), dtype = np.uint8, buffer = shm.buf)
     shared_array[:] = 0
     
+    sleep(0.1)
+    
     t = Thread(target=tqdm_track, args=(n, index))
     t.start()
     with Pool(32) as p:
         args = [([use_data[i, 0, :].ravel(), use_data[i, 1, :].ravel(), use_data[i, 2, :].ravel()], 0.0312, 0.0005, i, n, index) for i in range(n)]
-        res = p.map(func, args)
+        res = p.map(func, args, chunksize=32)
     shared_array[:] = 1
     t.join()
+    
+    sleep(0.1)
     shm.close()
     shm.unlink()
     
