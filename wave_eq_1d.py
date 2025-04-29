@@ -30,6 +30,7 @@ The used device can be chosen:
     device = 'cpu' for CPU calculations
     device = 'cuda' for GPU calculations
 """
+import setup
 
 from sparse.set_float_ import float_, to_torch, DefaultFloat
 import taichi as ti
