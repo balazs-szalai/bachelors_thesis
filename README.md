@@ -17,7 +17,10 @@ This is just supplementary material for a more simple reproducibillity of the th
 
 ## Dependencies
 The $packages$ folder contains the non-standard packages. Other than that all the code only depends on standard Python packages namely:
-Numpy, Scipy, Sympy, Pandas, PyTorch, Taichi, tqdm, Matplotlib (these also contain all the dependencies of the $packages$, too).
+Numpy, Scipy, Sympy, Pandas, PyTorch, Taichi (requires Pyhton 3.11 or lower), tqdm, Matplotlib (these also contain all the dependencies of the $packages$, too).
+All can be installed with pip:
+
+    pip install numpy scipy matplotlib pandas taichi torch sympy tqdm
 
 ## Contents
 Although the code is not well documented, each main file contains a small description in the beginning for better orientation.
