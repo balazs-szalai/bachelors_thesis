@@ -109,6 +109,7 @@ def find_peaks(spec, f_min = 1000, f_max = 2000, width = 400, w_len = 100, strid
     peaks = []
     unc = []
     errs = []
+    first = True
     while x1 <= f[-1]:
         x, y = window(f, r, x0, x1)
         try:
@@ -120,7 +121,7 @@ def find_peaks(spec, f_min = 1000, f_max = 2000, width = 400, w_len = 100, strid
             e_avg = np.mean(errs)
             e_std = np.std(errs)
             
-            if abs(errs[-1] - e_avg) < 2*e_std and abs(errs[-1] - e_avg) < f0/2:
+            if first or (abs(errs[-1] - e_avg) < 2*e_std and abs(errs[-1] - e_avg) < f0/2):
                 peaks.append(parms[0])
                 unc.append(np.sqrt(cov[0,0]))
             else:
@@ -133,6 +134,7 @@ def find_peaks(spec, f_min = 1000, f_max = 2000, width = 400, w_len = 100, strid
             unc.append(None)
             x0 += f0
             x1 = x0 + f0
+        first = False
     if not uncertainty:
         return np.array(peaks, dtype = float)
     else:
